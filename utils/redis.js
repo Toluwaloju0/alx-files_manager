@@ -13,8 +13,10 @@ class RedisClient {
   }
 
   async get(key) {
-    const value = await this.client.get(key);
-    return value;
+    this.client.get(key, (err, reply) => {
+      if (err) { return null; }
+      return reply;
+    });
   }
 
   async set(key, value, duration) {
