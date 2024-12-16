@@ -1,20 +1,20 @@
-import { createClient, print } from 'redis';
+import { createClient } from 'redis';
 
 class RedisClient {
   constructor() {
-    this.client  = createClient();
-    this.client.on('error', function (err) {
+    this.client = createClient();
+    this.client.on('error', (err) => {
       console.log(err);
-    })
+    });
   }
 
   isAlive() {
-    return this.client.on('connect', () => {return true});
+    return this.client.on('connect', () => true);
   }
 
   async get(key) {
-    this.client.get(key, (value) => {return value});
-    return null
+    this.client.get(key, (value) => value);
+    return null;
   }
 
   async set(key, value, duration) {
@@ -27,4 +27,5 @@ class RedisClient {
   }
 }
 
-export const redisClient = new RedisClient();
+const redisClient = new RedisClient();
+export default redisClient;
