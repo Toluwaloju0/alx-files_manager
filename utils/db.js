@@ -2,18 +2,31 @@ import { MongoClient } from 'mongodb';
 
 class DBClient {
   constructor() {
-    if (process.env.DB_HOST === null) {const host = 'localhost'}
-    else {const host = process.env.DB__HOST}
-    if (process.env.DB_PORT === null) {const port = '27017'}
-    else {const port = process.env.DB_PORT}
-    if (process.env.DB_DATABASE === null) {const db = 'file_manager'}
-    else {const db = process.env.DB_DATABASE}
+    const host = process.env.DB_HOST || 'localhost';
+    const port = process.env.DB_PORT || '27017';
+    const db = process.env.DB_DATABASE || 'files_manager';
+    const url = `mongodb://${host}:${port}/${url}`
 
-    this.client = MongoClient(`mongodb://${host}:${port}`)
+    // MongoClient.connect(url, (err, DB) => {
+    //   if (!err) {db = DB}
+    // })
+    // this.db = db
+
+    this._db = new MongoClient(url);
   }
 
   isAlive() {
-    this.client.on('connect' () => {return true})
-    return false
+   return this._db.isConnected();
+  }
+
+  async nbUsers() {
+    return this._db.collection('users').countDocuments();
+  }
+
+  async nbFiles() {
+    return this._db.collection('files').countDocuments();
   }
 }
+
+const dbClient = new DBClient();
+export default dbClient;

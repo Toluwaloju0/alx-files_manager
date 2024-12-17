@@ -2,3 +2,4 @@ node_modules
 .eslintrc.js
 babel.config.js
 package.json
+redis-7.4.0
