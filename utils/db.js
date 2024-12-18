@@ -4,24 +4,26 @@ class DBClient {
   constructor() {
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || '27017';
-    const url = `mongodb://${host}:${port}`
+    const url = `mongodb://${host}:${port}`;
 
-    this.client = MongoClient(url);
-    this.client.connect().catch((err) => { console.log(err) });
-
+    this.client = new MongoClient(url, { useUnifiedTopology: true });
+    // Connect to the database using .connect method
+    this.client.connect().catch((err) => {
+      throw err;
+    });
     this._db = process.env.DB_DATABASE || 'files_manager';
   }
 
   isAlive() {
-   this.client.isConnected();
+    return this.client.isConnected();
   }
 
   async nbUsers() {
-    return await this.client.db(this._db).collection('users').countDocuments();
+    return this.client.db(this._db).collection('users').countDocuments();
   }
 
   async nbFiles() {
-    return await this.client.db(this._db).collection('files').countDocuments();
+    return this.client.db(this._db).collection('files').countDocuments();
   }
 }
 
