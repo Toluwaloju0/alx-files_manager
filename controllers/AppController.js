@@ -13,19 +13,15 @@ const AppController = {
   },
 
   // The get stat function forthe GET /stat route
-  getStat(req, res) {
-    let users = 0;
-    let files = 0;
-    dbClient.nbUsers().then((nbUsers) => {
-      users = nbUsers;
+  async getStat(req, res) {
+    const resData = {};
+    await dbClient.nbUsers().then((nbUsers) => {
+      resData.users = nbUsers;
     });
-    dbClient.nbFiles().then((nbFiles) => {
-      files = nbFiles;
+    await dbClient.nbFiles().then((nbFiles) => {
+      resData.files = nbFiles;
     });
-    res.status(200).json({
-      users,
-      files,
-    }).end();
+    res.status(200).json(resData).end();
   },
 };
 

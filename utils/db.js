@@ -25,6 +25,20 @@ class DBClient {
   async nbFiles() {
     return this.client.db(this._db).collection('files').countDocuments();
   }
+
+  async getUser(keys, collection = 'users') {
+    const user = await this.client.db(this._db).collection(collection).findOne(keys);
+    if (user) { return user; }
+    return null;
+  }
+
+  async saveUSer(email, password) {
+    const newUser = await this.client.db(this._db).collection('users').insertOne({
+      email,
+      password,
+    });
+    return newUser.insertedId;
+  }
 }
 
 const dbClient = new DBClient();
