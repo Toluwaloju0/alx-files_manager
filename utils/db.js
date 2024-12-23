@@ -26,9 +26,9 @@ class DBClient {
     return this.client.db(this._db).collection('files').countDocuments();
   }
 
-  async getUser(keys, collection = 'users') {
-    const user = await this.client.db(this._db).collection(collection).findOne(keys);
-    if (user) { return user; }
+  async getData(keys, collection = 'users') {
+    const data = await this.client.db(this._db).collection(collection).findOne(keys);
+    if (data) { return data; }
     return null;
   }
 
@@ -38,6 +38,11 @@ class DBClient {
       password,
     });
     return newUser.insertedId;
+  }
+
+  async saveFile(keys) {
+    const File = await this.client.db(this._db).collection('files').insertOne(keys);
+    return File.insertedId;
   }
 }
 

@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import dbClient from '../utils/db';
 import createHash from '../utils/hashPwd';
 import redisClient from '../utils/redis';
@@ -12,7 +13,7 @@ const UsersController = {
       res.status(400).json({ error: 'Missing password' }).end();
       return;
     }
-    const user = await dbClient.getUser({ email }, 'users');
+    const user = await dbClient.getData({ email });
     if (user) {
       res.status(400).json({ error: 'Already exist' }).end();
     } else {
@@ -28,10 +29,10 @@ const UsersController = {
   async getMe(req, res) {
     // Get the token for the user auth then get the user id in redis
     const token = req.get('x-token');
-    const userId = redisClient.get(`auth_${token}`);
+    const Id = await redisClient.get(`auth_${token}`);
 
     // get the user from the db client
-    const user = await dbClient.get({ _id: userId });
+    const user = await dbClient.getData({ _id: ObjectId(Id) });
     if (user) {
       res.json({
         id: user._id,
