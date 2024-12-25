@@ -8,6 +8,6 @@ const decoder = {
   dataDecoder(string) {
     return Buffer.from(string, 'base64').toString();
   },
-}
+};
 
 export default decoder;

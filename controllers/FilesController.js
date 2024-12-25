@@ -1,5 +1,7 @@
 import { ObjectId } from 'mongodb';
-import { readFileAsync } from 'process';
+import fs from 'fs';
+import { uuid } from 'uuidv4';
+import path from 'path';
 import decoder from '../utils/decoder';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
@@ -9,7 +11,7 @@ const FilesController = {
     // Get the token and retrieve the user id using redis client
     const token = req.get('X-token');
     const userId = await redisClient.get(`auth_${token}`);
-    const user = await dbClient.getUser({ _id: ObjectId(userId) });
+    const user = await dbClient.getData({ _id: ObjectId(userId) });
     if (user === null) {
       res.status(401).json({ error: 'Unauthorized' }).end();
       return { error: 'Unauthorized' };
@@ -18,25 +20,28 @@ const FilesController = {
     const typeVar = ['folder', 'file', 'image'];
     // Get the name and type from the request body
     const { name, type, data } = req.body;
-    if (name === null || name === undefined) {
+    if (name === undefined) {
       res.status(400).json({
         error: 'Missing name',
       }).end();
       return { error: 'Missing name' };
-    } if (type === null || type === undefined || !typeVar.includes(type)) {
+    } if (type === undefined || !typeVar.includes(type)) {
       res.status(400).json({
         error: 'Missing type',
       }).end();
       return { error: 'Missing type' };
-    } if (type !== 'folder' && (data === null || data === undefined)) {
+    } if (type !== 'folder' && (data === undefined)) {
       res.status(400).json({
         error: 'Missing data',
       }).end();
       return { error: 'Missing data' };
     }
     // Define the parent id and the is public variables
-    const { parentId } = req.body || 0;
-    const { isPublic } = req.body || false;
+    let { parentId } = req.body;
+    let { isPublic } = req.body;
+    if (parentId === undefined) { parentId = '0'; }
+    if (isPublic === undefined) { isPublic = false; }
+    console.log(`The parentId id ${parentId} and the isPublic is ${isPublic}`);
     if (parentId !== '0') {
       const parent = dbClient.getData({ _id: ObjectId(parentId) }, 'files');
       if (parent === null) {
@@ -56,13 +61,39 @@ const FilesController = {
       };
       const id = await dbClient.saveFile(key);
       res.status(201).json({
-        id, userId, name, type, isPublic, parentId,
+        id, userId: ObjectId(userId), name, type, isPublic, parentId,
       }).end();
-    } else {
-      // Get the folder path and the converted data given
-      const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
-      const clearData = decoder.dataDecoder(data);
+      return {
+        id, userId, name, type, isPublic, parentId,
+      };
     }
+    // Get the folder path and the converted data given
+    const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
+    const clearData = decoder.dataDecoder(data);
+    // check if the folder exists else create it
+    fs.stat(folderPath, (err, stat) => {
+      if (err || stat.isFile()) { fs.mkdirSync(folderPath); }
+    });
+    // create a path to store the data
+    const filePath = `${folderPath}/${uuid()}`;
+    const writeFile = fs.createWriteStream(filePath);
+    writeFile.write(clearData);
+    writeFile.end();
+    const localPath = path.resolve(filePath);
+    const fileId = await dbClient.saveFile({
+      userId, name, type, isPublic, parentId, localPath,
+    });
+    res.status(201).json({
+      id: fileId,
+      userId: ObjectId(userId),
+      name,
+      type,
+      isPublic,
+      parentId,
+    }).end();
+    return ({
+      fileId, userId, name, type, isPublic, parentId,
+    });
   },
 };
 
