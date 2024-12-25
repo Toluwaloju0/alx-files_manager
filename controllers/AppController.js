@@ -13,7 +13,7 @@ const AppController = {
   },
 
   // The get stat function forthe GET /stat route
-  async getStat(req, res) {
+  async getStats(req, res) {
     const resData = {};
     await dbClient.nbUsers().then((nbUsers) => {
       resData.users = nbUsers;
