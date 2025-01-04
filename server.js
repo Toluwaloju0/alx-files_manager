@@ -5,6 +5,4 @@ const app = express();
 const port = parseInt(process.env.PORT, 10) || 5000;
 
 app.use('/', router);
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
+app.listen(port);
