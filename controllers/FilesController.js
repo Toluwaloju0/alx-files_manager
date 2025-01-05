@@ -95,6 +95,48 @@ const FilesController = {
       fileId, userId, name, type, isPublic, parentId,
     });
   },
+
+  // The route for the GET /file/:id
+  async getShow(req, res) {
+    // Get the id from the parameters in the URL
+    const fileId = req.param.id;
+    const userId = await redisClient.get(req.get('X-token'));
+    // retrieve the user based on the token
+    const user = dbClient.getData({ _id: ObjectId(userId) });
+    if (user === null) {
+      res.status(400).json({
+        error: 'Unauthorized',
+      }).end();
+      return;
+    }
+    const file = dbClient.getData({ _id: ObjectId(fileId), userId: ObjectId(userId) }, 'files');
+    if (file === null) {
+      res.status(404).json({
+        error: 'Not found',
+      }).end();
+    } else {
+      res.json(file).end();
+    }
+  },
+
+  // Route for the //files endpoint
+  // getIndex(req, res) {
+  //   // Get the user from the token
+  //   const userId = req.get('X-token');
+  //   const user = dbClient.get({_id: ObjectId(userId)});
+  //   if (user === null) {
+  //     res.status(400).json({
+  //       error: 'Unauthorized'
+  //     }).end();
+  //     return;
+  //   }
+  //   const keys = {
+  //     @facet: {}
+  //   }
+  //   const { parentId, page } = req.body;
+  //   if (parentId) {key['parentId'] = ObjectId(parentId)}
+
+  // }
 };
 
 export default FilesController;
