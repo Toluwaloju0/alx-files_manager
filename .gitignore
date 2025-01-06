@@ -1,5 +1,5 @@
 node_modules
 .eslintrc.js
 babel.config.js
-package.json
+package*
 redis-7.4.0
