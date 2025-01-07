@@ -28,7 +28,7 @@ const UsersController = {
 
   async getMe(req, res) {
     // Get the token for the user auth then get the user id in redis
-    const token = req.get('x-token');
+    const token = req.get('X-Token');
     const Id = await redisClient.get(`auth_${token}`);
 
     // get the user from the db client

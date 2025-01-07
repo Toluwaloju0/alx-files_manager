@@ -28,7 +28,7 @@ const AuthController = {
 
   async getDisconnect(req, res) {
     // Get the token from the header, get the user_id from redis client
-    const token = req.get('x-token');
+    const token = req.get('X-Token');
     const key = `auth${token}`;
     const userId = await redisClient.get(key);
 
