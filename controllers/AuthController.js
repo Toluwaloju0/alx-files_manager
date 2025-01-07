@@ -1,4 +1,4 @@
-import uuid from 'uuid-v4';
+import { v4 } from 'uuid';
 import { ObjectId } from 'mongodb';
 import decoder from '../utils/decoder';
 import hashPassword from '../utils/hashPwd';
@@ -10,7 +10,7 @@ const AuthController = {
     // Get the basic auth stringet the and convert it, get the token
     const Auth = req.get('Authorization').split(' ');
     const decoded = decoder.stringDecoder(Auth[1]);
-    const token = String(uuid());
+    const token = String(v4());
 
     // Get the user from db client
     const user = await dbClient.getData({ email: decoded[0] });
