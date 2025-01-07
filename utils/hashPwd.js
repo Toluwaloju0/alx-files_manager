@@ -1,7 +1,5 @@
-import crypto from 'crypto';
+import sha1 from 'sha1';
 
 export default function hashPassword(password) {
-  const hasher = crypto.createHash('sha1');
-  hasher.update(password);
-  return hasher.digest('hex');
+  return sha1(password);
 }
