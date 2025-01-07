@@ -1,4 +1,4 @@
-import { uuid } from 'uuid-v4';
+import uuid from 'uuid-v4';
 import { ObjectId } from 'mongodb';
 import decoder from '../utils/decoder';
 import hashPassword from '../utils/hashPwd';
