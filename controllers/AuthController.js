@@ -33,7 +33,7 @@ const AuthController = {
     const userId = await redisClient.get(key);
 
     // Get the user from db client
-    const user = dbClient.getData({ _id: ObjectId(userId) });
+    const user = await dbClient.getData({ _id: ObjectId(userId) });
 
     if (user) {
       await redisClient.del(`auth_${token}`);
