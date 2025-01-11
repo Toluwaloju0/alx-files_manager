@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import fs from 'fs';
-import { uuid } from 'uuidv4';
+import { v4 } from 'uuid';
 import path from 'path';
 import decoder from '../utils/decoder';
 import dbClient from '../utils/db';
@@ -41,31 +41,25 @@ const FilesController = {
     let { isPublic } = req.body;
     if (parentId === undefined) { parentId = '0'; }
     if (isPublic === undefined) { isPublic = false; }
-    console.log(`The parentId id ${parentId} and the isPublic is ${isPublic}`);
     if (parentId !== '0') {
       const parent = dbClient.getData({ _id: ObjectId(parentId) }, 'files');
       if (parent === null) {
-        res.status(400).json({
+        return res.status(400).json({
           error: 'Parent not found',
         }).end();
-        return { error: 'Parent not found' };
       } if (parent.type !== 'folder') {
-        res.status(400).json({
+        return res.status(400).json({
           error: 'Parent is not a folder',
         }).end();
-        return { error: 'Parent is not a folder' };
       }
     } else if (type === 'folder') {
       const key = {
         userId, name, type, parentId,
       };
       const id = await dbClient.saveFile(key);
-      res.status(201).json({
+      return res.status(201).json({
         id, userId: ObjectId(userId), name, type, isPublic, parentId,
       }).end();
-      return {
-        id, userId, name, type, isPublic, parentId,
-      };
     }
     // Get the folder path and the converted data given
     const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -75,7 +69,7 @@ const FilesController = {
       if (err || stat.isFile()) { fs.mkdirSync(folderPath); }
     });
     // create a path to store the data
-    const filePath = `${folderPath}/${uuid()}`;
+    const filePath = `${folderPath}/${v4()}`;
     const writeFile = fs.createWriteStream(filePath);
     writeFile.write(clearData);
     writeFile.end();
@@ -83,7 +77,7 @@ const FilesController = {
     const fileId = await dbClient.saveFile({
       userId, name, type, isPublic, parentId, localPath,
     });
-    res.status(201).json({
+    return res.status(201).json({
       id: fileId,
       userId: ObjectId(userId),
       name,
@@ -91,9 +85,6 @@ const FilesController = {
       isPublic,
       parentId,
     }).end();
-    return ({
-      fileId, userId, name, type, isPublic, parentId,
-    });
   },
 
   // The route for the GET /file/:id
