@@ -58,7 +58,7 @@ const FilesController = {
     // Get the folder path and the converted data given
     const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
     // check if the folder exists else create it
-    await fs.mkdir(folderPath, { recursive: true })
+    await fs.mkdir(folderPath, { recursive: true });
     // create a write stream and store the data in clear
     const filePath = `${folderPath}/${v4()}`;
     await fs.writeFile(filePath, decoder.dataDecoder(data), { mode: 0o666, flag: 'w' });
