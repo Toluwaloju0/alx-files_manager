@@ -42,7 +42,7 @@ class DBClient {
 
   async saveFile(keys) {
     const File = await this.client.db(this._db).collection('files').insertOne(keys);
-    return File.insertedId;
+    return File.ops[0];
   }
 }
 
