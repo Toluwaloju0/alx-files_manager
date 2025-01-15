@@ -9,7 +9,7 @@ import redisClient from '../utils/redis';
 const FilesController = {
   async postUpload(req, res) {
     // Get the token and retrieve the user id using redis client
-    const token = req.get('X-token');
+    const token = req.get('X-Token');
     const userId = await redisClient.get(`auth_${token}`);
     const user = await dbClient.getData({ _id: ObjectId(userId) });
     if (user === null) {
