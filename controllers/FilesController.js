@@ -14,7 +14,7 @@ const FilesController = {
     const userId = await redisClient.get(`auth_${token}`);
     const user = await dbClient.getData({ _id: ObjectId(userId) });
     if (user === null) {
-      return res.status(401).json({
+      res.status(401).json({
         error: 'Unauthorized',
       }).end();
     }
@@ -24,15 +24,15 @@ const FilesController = {
     } = req.body;
     const types = ['folder', 'file', 'image'];
     if (name === undefined) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Missing name',
       }).end();
     } if (type === undefined || !types.includes(type)) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Missing type',
       }).end();
     } if (type !== 'folder' && data === undefined) {
-      return res.status(400).json({
+      res.status(400).json({
         error: 'Missing data',
       }).end();
     }
@@ -45,11 +45,11 @@ const FilesController = {
       // get the parent from the database
       const parent = await dbClient.getData({ _id: ObjectId(parentId) }, 'files');
       if (parent === null) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Parent not found',
         }).end();
       } if (parent.type !== 'folder') {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Parent is not a folder',
         }).end();
       }
@@ -67,7 +67,7 @@ const FilesController = {
       keys.localPath = await path.resolve(fileName);
     }
     const file = await dbClient.saveFile(keys);
-    return res.status(201).json(file).end();
+    res.status(201).json(file).end();
   },
   // async getShow(req, res) {
   // Get the id from the parameters in the URL
