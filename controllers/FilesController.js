@@ -36,24 +36,24 @@ const FilesController = {
       }).end();
     }
     // Set the parentId and isPublic variables if they are undefined
-    // let { parentId, isPublic } = req.body;
-    // if (parentId === undefined) { parentId = '0'; }
-    // if (isPublic === undefined) { isPublic = false; }
+    let { parentId, isPublic } = req.body;
+    if (parentId === undefined) { parentId = '0'; }
+    if (isPublic === undefined) { isPublic = false; }
 
-    // if (parentId !== '0') {
-    //   // get the parent from the database
-    //   const parent = await dbClient.getData({ _id: ObjectId(parentId) }, 'files');
-    //   if (parent === null) {
-    //     return res.status(400).json({
-    //       error: 'Parent not found',
-    //     }).end();
-    //   } if (parent.type !== 'folder') {
-    //     return res.status(400).json({
-    //       error: 'Parent is not a folder',
-    //     }).end();
-    //   }
-    // }
-    // // Create a variable to store all keys which will be added to DB
+    if (parentId !== '0') {
+      // get the parent from the database
+      const parent = await dbClient.getData({ _id: ObjectId(parentId) }, 'files');
+      if (parent === null) {
+        return res.status(400).json({
+          error: 'Parent not found',
+        }).end();
+      } if (parent.type !== 'folder') {
+        return res.status(400).json({
+          error: 'Parent is not a folder',
+        }).end();
+      }
+    }
+    // Create a variable to store all keys which will be added to DB
     // const keys = {
     //   userId, name, type, parentId, isPublic,
     // };
