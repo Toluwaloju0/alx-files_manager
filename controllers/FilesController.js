@@ -13,31 +13,29 @@ const FilesController = {
     const userId = await redisClient.get(`aut_${token}`);
     const user = await dbClient.getData({ _id: ObjectId(userId) });
     if (user === null) {
-      console.log('good')
       res.status(401).json({
         error: 'Unauthorized',
       }).end();
     }
-    console.log('bad')
     // Get all the required data from the req body and define accepted types
-    // const {
-    //   name, type, data,
-    // } = req.body;
-    // const types = ['folder', 'file', 'image'];
-    // if (name === undefined) {
-    //   return res.status(400).json({
-    //     error: 'Missing name',
-    //   }).end();
-    // } if (type === undefined || !types.includes(type)) {
-    //   return res.status(400).json({
-    //     error: 'Missing type',
-    //   }).end();
-    // } if (type !== 'folder' && data === undefined) {
-    //   return res.status(400).json({
-    //     error: 'Missing data',
-    //   }).end();
-    // }
-    // // Set the parentId and isPublic variables if they are undefined
+    const {
+      name, type, data,
+    } = req.body;
+    const types = ['folder', 'file', 'image'];
+    if (name === undefined) {
+      return res.status(400).json({
+        error: 'Missing name',
+      }).end();
+    } if (type === undefined || !types.includes(type)) {
+      return res.status(400).json({
+        error: 'Missing type',
+      }).end();
+    } if (type !== 'folder' && data === undefined) {
+      return res.status(400).json({
+        error: 'Missing data',
+      }).end();
+    }
+    // Set the parentId and isPublic variables if they are undefined
     // let { parentId, isPublic } = req.body;
     // if (parentId === undefined) { parentId = '0'; }
     // if (isPublic === undefined) { isPublic = false; }
