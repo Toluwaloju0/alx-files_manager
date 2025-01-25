@@ -10,7 +10,7 @@ const FilesController = {
     // The endpoint for creating a new file in db
     // Check if the user exists before creating a file
     const token = req.get('X-Token');
-    const userId = await redisClient.get(`aut_${token}`);
+    const userId = await redisClient.get(`auth_${token}`);
     const user = await dbClient.getData({ _id: ObjectId(userId) });
     if (user === null) {
       res.status(401).json({
@@ -26,14 +26,14 @@ const FilesController = {
       return res.status(400).json({
         error: 'Missing name',
       }).end();
-    // } if (type === undefined || !types.includes(type)) {
-    //   return res.status(400).json({
-    //     error: 'Missing type',
-    //   }).end();
-    // } if (type !== 'folder' && data === undefined) {
-    //   return res.status(400).json({
-    //     error: 'Missing data',
-    //   }).end();
+    } if (type === undefined || !types.includes(type)) {
+      return res.status(400).json({
+        error: 'Missing type',
+      }).end();
+    } if (type !== 'folder' && data === undefined) {
+      return res.status(400).json({
+        error: 'Missing data',
+      }).end();
     }
     // Set the parentId and isPublic variables if they are undefined
     // let { parentId, isPublic } = req.body;
