@@ -13,7 +13,7 @@ const FilesController = {
     const userId = await redisClient.get(`auth_${token}`);
     const user = await dbClient.getData({ _id: ObjectId(userId) });
     if (user === null) {
-      res.status(401).json({
+      return res.status(401).json({
         error: 'Unauthorized',
       }).end();
     }
@@ -54,9 +54,9 @@ const FilesController = {
       }
     }
     // Create a variable to store all keys which will be added to DB
-    // const keys = {
-    //   userId, name, type, parentId, isPublic,
-    // };
+    const keys = {
+      userId, name, type, parentId, isPublic,
+    };
     // if (type !== 'folder') {
     //   // Get the path to the folder to store all files and create it
     //   const folder = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -65,8 +65,8 @@ const FilesController = {
     //   await fs.writeFile(fileName, decoder.dataDecoder(data), { mode: 0o666, flag: 'w' });
     //   keys.localPath = await path.resolve(fileName);
     // }
-    // const file = await dbClient.saveFile(keys);
-    // res.status(201).json(file).end();
+    const file = await dbClient.saveFile(keys);
+    return res.status(201).json(file).end();
   },
   // async getShow(req, res) {
   // Get the id from the parameters in the URL
