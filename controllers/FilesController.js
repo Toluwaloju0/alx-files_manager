@@ -26,14 +26,14 @@ const FilesController = {
       return res.status(400).json({
         error: 'Missing name',
       }).end();
-    } if (type === undefined || !types.includes(type)) {
-      return res.status(400).json({
-        error: 'Missing type',
-      }).end();
-    } if (type !== 'folder' && data === undefined) {
-      return res.status(400).json({
-        error: 'Missing data',
-      }).end();
+    // } if (type === undefined || !types.includes(type)) {
+    //   return res.status(400).json({
+    //     error: 'Missing type',
+    //   }).end();
+    // } if (type !== 'folder' && data === undefined) {
+    //   return res.status(400).json({
+    //     error: 'Missing data',
+    //   }).end();
     }
     // Set the parentId and isPublic variables if they are undefined
     // let { parentId, isPublic } = req.body;

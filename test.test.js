@@ -76,21 +76,20 @@ describe('POST /files', () => {
         fctRemoveAllRedisKeys();
     });
 
-    it('POST /files invalid token user', (done) => {
+    it('POST /files with missing name', (done) => {
         const fileData = {
-            name: fctRandomString(),
             type: 'folder'
         }
         chai.request('http://localhost:5000')
             .post('/files')
-            .set('X-Token', `${initialUserToken}_121`)
+            .set('X-Token', initialUserToken)
             .send(fileData)
             .end(async (err, res) => {
                 chai.expect(err).to.be.null;
-                chai.expect(res).to.have.status(401);
+                chai.expect(res).to.have.status(400);
 
                 const resError = res.body.error;
-                chai.expect(resError).to.equal("Unauthorized");
+                chai.expect(resError).to.equal("Missing name");
                 
                 testClientDb.collection('files')
                     .find({})
