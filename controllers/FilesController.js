@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb';
-import fs from 'fs/promises';
 import { v4 } from 'uuid';
 import path from 'path';
 import decoder from '../utils/decoder';
@@ -11,63 +10,65 @@ const FilesController = {
     // The endpoint for creating a new file in db
     // Check if the user exists before creating a file
     const token = req.get('X-Token');
-    const userId = await redisClient.get(`auth_${token}`);
+    const userId = await redisClient.get(`aut_${token}`);
     const user = await dbClient.getData({ _id: ObjectId(userId) });
     if (user === null) {
+      console.log('good')
       res.status(401).json({
         error: 'Unauthorized',
       }).end();
     }
+    console.log('bad')
     // Get all the required data from the req body and define accepted types
-    const {
-      name, type, data,
-    } = req.body;
-    const types = ['folder', 'file', 'image'];
-    if (name === undefined) {
-      res.status(400).json({
-        error: 'Missing name',
-      }).end();
-    } if (type === undefined || !types.includes(type)) {
-      res.status(400).json({
-        error: 'Missing type',
-      }).end();
-    } if (type !== 'folder' && data === undefined) {
-      res.status(400).json({
-        error: 'Missing data',
-      }).end();
-    }
-    // Set the parentId and isPublic variables if they are undefined
-    let { parentId, isPublic } = req.body;
-    if (parentId === undefined) { parentId = '0'; }
-    if (isPublic === undefined) { isPublic = false; }
+    // const {
+    //   name, type, data,
+    // } = req.body;
+    // const types = ['folder', 'file', 'image'];
+    // if (name === undefined) {
+    //   return res.status(400).json({
+    //     error: 'Missing name',
+    //   }).end();
+    // } if (type === undefined || !types.includes(type)) {
+    //   return res.status(400).json({
+    //     error: 'Missing type',
+    //   }).end();
+    // } if (type !== 'folder' && data === undefined) {
+    //   return res.status(400).json({
+    //     error: 'Missing data',
+    //   }).end();
+    // }
+    // // Set the parentId and isPublic variables if they are undefined
+    // let { parentId, isPublic } = req.body;
+    // if (parentId === undefined) { parentId = '0'; }
+    // if (isPublic === undefined) { isPublic = false; }
 
-    if (parentId !== '0') {
-      // get the parent from the database
-      const parent = await dbClient.getData({ _id: ObjectId(parentId) }, 'files');
-      if (parent === null) {
-        res.status(400).json({
-          error: 'Parent not found',
-        }).end();
-      } if (parent.type !== 'folder') {
-        res.status(400).json({
-          error: 'Parent is not a folder',
-        }).end();
-      }
-    }
-    // Create a variable to store all keys which will be added to DB
-    const keys = {
-      userId, name, type, parentId, isPublic,
-    };
-    if (type !== 'folder') {
-      // Get the path to the folder to store all files and create it
-      const folder = process.env.FOLDER_PATH || '/tmp/files_manager';
-      await fs.mkdir(folder, { recursive: true });
-      const fileName = `${folder}/${v4()}`;
-      await fs.writeFile(fileName, decoder.dataDecoder(data), { mode: 0o666, flag: 'w' });
-      keys.localPath = await path.resolve(fileName);
-    }
-    const file = await dbClient.saveFile(keys);
-    res.status(201).json(file).end();
+    // if (parentId !== '0') {
+    //   // get the parent from the database
+    //   const parent = await dbClient.getData({ _id: ObjectId(parentId) }, 'files');
+    //   if (parent === null) {
+    //     return res.status(400).json({
+    //       error: 'Parent not found',
+    //     }).end();
+    //   } if (parent.type !== 'folder') {
+    //     return res.status(400).json({
+    //       error: 'Parent is not a folder',
+    //     }).end();
+    //   }
+    // }
+    // // Create a variable to store all keys which will be added to DB
+    // const keys = {
+    //   userId, name, type, parentId, isPublic,
+    // };
+    // if (type !== 'folder') {
+    //   // Get the path to the folder to store all files and create it
+    //   const folder = process.env.FOLDER_PATH || '/tmp/files_manager';
+    //   await fs.mkdir(folder, { recursive: true });
+    //   const fileName = `${folder}/${v4()}`;
+    //   await fs.writeFile(fileName, decoder.dataDecoder(data), { mode: 0o666, flag: 'w' });
+    //   keys.localPath = await path.resolve(fileName);
+    // }
+    // const file = await dbClient.saveFile(keys);
+    // res.status(201).json(file).end();
   },
   // async getShow(req, res) {
   // Get the id from the parameters in the URL
