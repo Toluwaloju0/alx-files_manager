@@ -3,7 +3,7 @@ import chaiHttp from 'chai-http';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { MongoClient, ObjectID } from 'mongodb';
+import MongoClient from 'mongodb';
 import { promisify } from 'util';
 import redis from 'redis';
 import sha1 from 'sha1';
@@ -76,9 +76,10 @@ describe('POST /files', () => {
         fctRemoveAllRedisKeys();
     });
 
-    it('POST /files with missing name', (done) => {
+    it('POST /files creates a folder at the root', (done) => {
         const fileData = {
-            type: 'folder'
+            name: fctRandomString(),
+            type: 'folder',
         }
         chai.request('http://localhost:5000')
             .post('/files')
@@ -86,17 +87,25 @@ describe('POST /files', () => {
             .send(fileData)
             .end(async (err, res) => {
                 chai.expect(err).to.be.null;
-                chai.expect(res).to.have.status(400);
+                chai.expect(res).to.have.status(201);
 
-                const resError = res.body.error;
-                chai.expect(resError).to.equal("Missing name");
+                const resFile = res.body;
+                chai.expect(resFile.name).to.equal(fileData.name);
+                chai.expect(resFile.userId).to.equal(initialUserId);
+                chai.expect(resFile.type).to.equal(fileData.type);
+                chai.expect(resFile.parentId).to.equal(0);
                 
                 testClientDb.collection('files')
                     .find({})
                     .toArray((err, docs) => {
                         chai.expect(err).to.be.null;
-                        chai.expect(docs.length).to.equal(0);
-
+                        chai.expect(docs.length).to.equal(1);
+                        const docFile = docs[0];
+                        chai.expect(docFile.name).to.equal(fileData.name);
+                        chai.expect(docFile._id.toString()).to.equal(resFile.id);
+                        chai.expect(docFile.userId.toString()).to.equal(initialUserId);
+                        chai.expect(docFile.type).to.equal(fileData.type);
+                        chai.expect(docFile.parentId.toString()).to.equal('0');
                         done();
                     })
             });

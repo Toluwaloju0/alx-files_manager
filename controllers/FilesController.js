@@ -1,5 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { v4 } from 'uuid';
+import fs from 'fs/promises';
+import uuid from 'uuid'
 import path from 'path';
 import decoder from '../utils/decoder';
 import dbClient from '../utils/db';
@@ -37,10 +39,12 @@ const FilesController = {
     }
     // Set the parentId and isPublic variables if they are undefined
     let { parentId, isPublic } = req.body;
-    if (parentId === undefined) { parentId = '0'; }
+    if (parentId === undefined) { parentId = 0; }
     if (isPublic === undefined) { isPublic = false; }
+    const root = process.env.FOLDER_PATH || '/tmp/files_manager';
+    let path;
 
-    if (parentId !== '0') {
+    if (parentId !== 0) {
       // get the parent from the database
       const parent = await dbClient.getData({ _id: ObjectId(parentId) }, 'files');
       if (parent === null) {
@@ -52,15 +56,17 @@ const FilesController = {
           error: 'Parent is not a folder',
         }).end();
       }
-    }
+      path = `${root}/${parentId}`;
+    } else {path = `${root}`}
     // Create a variable to store all keys which will be added to DB
     const keys = {
       userId, name, type, parentId, isPublic,
     };
+    // create the folder if it doesnt exists
+    await fs.mkdir(path, { recursive: true });
     // if (type !== 'folder') {
     //   // Get the path to the folder to store all files and create it
     //   const folder = process.env.FOLDER_PATH || '/tmp/files_manager';
-    //   await fs.mkdir(folder, { recursive: true });
     //   const fileName = `${folder}/${v4()}`;
     //   await fs.writeFile(fileName, decoder.dataDecoder(data), { mode: 0o666, flag: 'w' });
     //   keys.localPath = await path.resolve(fileName);
