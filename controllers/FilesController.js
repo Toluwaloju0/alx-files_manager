@@ -63,7 +63,7 @@ const FilesController = {
       userId, name, type, parentId, isPublic,
     };
     // create the folder if it doesnt exists
-    await fs.mkdir(path, { recursive: true });
+    // await fs.mkdir(path, { recursive: true });
     // if (type !== 'folder') {
     //   // Get the path to the folder to store all files and create it
     //   const folder = process.env.FOLDER_PATH || '/tmp/files_manager';
