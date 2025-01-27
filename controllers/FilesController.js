@@ -39,12 +39,12 @@ const FilesController = {
     }
     // Set the parentId and isPublic variables if they are undefined
     let { parentId, isPublic } = req.body;
-    if (parentId === undefined) { parentId = 0; }
+    if (parentId === undefined) { parentId = "0"; }
     if (isPublic === undefined) { isPublic = false; }
     const root = process.env.FOLDER_PATH || '/tmp/files_manager';
     let path;
 
-    if (parentId !== 0) {
+    if (parentId !== "0") {
       // get the parent from the database
       const parent = await dbClient.getData({ _id: ObjectId(parentId) }, 'files');
       if (parent === null) {
